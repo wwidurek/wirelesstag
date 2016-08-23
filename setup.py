@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
     name='pywirelesstags',
-    version='0.5.2', # Should be updated with new versions
+    version='0.5.0', # Should be updated with new versions
     author='Wojtek Widurek',
     author_email='wwidurek@gmail.com',
     py_modules=['wirelesstag'],
