@@ -1,8 +1,6 @@
 import requests
 import json
 
-COOKIES = None
-
 _USERNAME = ""
 _PASSWORD = ""
 
@@ -137,20 +135,3 @@ class WirelessTagData:
         parsed_response = r.json()
         return parsed_response["d"]["battery_volts"]
 
-
-if __name__ == "__main__":
-
-    print "here"
-    #authCookie = ClientAuth() 
-    auth = ClientAuth() 
-    tags = WirelessTagData(auth) 
-    print tags.getTemperature(tags.tagList.keys()[1])
-    print tags.getHumidity()
-    print tags.getBatteryVolt()
-#	if login() == True:
-#                while 1:
- #                        GetTagList()
-#			for i in GetTagList():
-#
-#			   print GetTagData(i) 
-#                        time.sleep(3600)
