@@ -3,73 +3,154 @@ import json
 
 COOKIES = None
 
-USERNAME = "wwidurek@gmail.com"
-PASSWORD = "k4loryferM2010"
+_USERNAME = ""
+_PASSWORD = ""
 
-BASEURL = "https://www.mytaglist.com"
+_BASEURL = "https://www.mytaglist.com"
 
-SIGNIN = BASEURL + "/ethAccount.asmx/SignIn"
-GETTEMPERATURERAWDATA = BASEURL + "/ethLogs.asmx/GetTemperatureRawData"
-GETTAGLIST = BASEURL + "/ethClient.asmx/GetTagList"
-GETHOURLYSTATS = BASEURL + "/ethLogs.asmx/GetHourlyStats"
-GETMULTITAGSTATSRAW = BASEURL + "/ethLogs.asmx/GetMultiTagStatsRaw"
-GETTEMPDATA = BASEURL + "/ethLogShared.asmx/GetLatestTemperatureRawDataByUUID"
+_SIGNIN = _BASEURL + "/ethAccount.asmx/SignIn"
+_ISSIGNED = _BASEURL + "/ethAccount.asmx/IsSignedIn"
+_GETTAGLIST = _BASEURL + "/ethClient.asmx/GetTagList"
+_GETTEMPDATA = _BASEURL + "/ethLogShared.asmx/GetLatestTemperatureRawDataByUUID"
 
-HEADERS = {
+_HEADERS = {
 	"content-type": "application/json; charset=utf-8"
 }
 
-def login():
-	global COOKIES
+class ClientAuth:
+    """
 
-	data = {
-		"email": USERNAME,
-		"password": PASSWORD
-	}
-	
-	r = requests.post(SIGNIN, headers=HEADERS, data=json.dumps(data))
-	COOKIES = r.cookies
-	
-	if "set-cookie" in r.headers:
-		print "Login successful"
-	else:
-		print "Login failed"
-		return False
-		
-	return True
+    Request authentication and return authentication cookie. If cookie requested and not already logged in, it will log in again.
 
-def GetTagList():
-	data = {}
-        tag_list = {}
-	
-	r = requests.post(GETTAGLIST, headers=HEADERS, cookies=COOKIES, data=json.dumps(data))
-	
-	response = r.json()
-	for i in response:
-		for tag in response[i]:
-			tag_id = tag["slaveId"]
-			tag_uuid = tag["uuid"]
-			tag_name = tag["name"]
-			tag_type = tag["tagType"]			
-		
-			tag_list[tag_uuid] = {'tag_id' : tag_id, 'tag_name' : tag_name, 'tag_type' : tag_type}	
-					
-	return tag_list
+    """ 
+    def __init__(self, username=_USERNAME,
+                       password=_PASSWORD):
+        
+       postParams = {
+             "email": username,
+             "password": password
+             }
 
-#returns current data from tag in the following format (temp,humidity,battery_volt)
-def GetTagData(tag_uuid):
-     data = {
-             "uuid": tag_uuid 
-            }
+       r = requests.post(_SIGNIN, headers=_HEADERS, data=json.dumps(postParams))
+        
+       self._accessCookie = r.cookies 
+       self._username = username
+       self._password = password
 
-     r  = requests.post(GETTEMPDATA, headers=HEADERS, cookies=COOKIES, data=json.dumps(data)) 
-     parsed_response = r.json() 
-     return parsed_response["d"]["temp_degC"], parsed_response["d"]["cap"], parsed_response["d"]["battery_volts"]
-	
+    @property
+    def accessCookie(self):
+      #if not signed in, sign in and return cookie
+
+       r = requests.post(_ISSIGNED, headers=_HEADERS)
+       response = r.json()
+       if response['d']=='TRUE':
+          return self._accessCookie 
+       else:
+            postParams = {
+              "email": self._username,
+              "password": self._password
+             }
+
+            r = requests.post(_SIGNIN, headers=_HEADERS, data=json.dumps(postParams))
+
+            self._accessCookie = r.cookies
+            return self._accessCookie
+
+       return self._accessCookie
+
+class WirelessTagData:
+   """
+   Retrieves data from Wireless senors available
+   """    
+
+
+   def __init__(self,authData):
+      self.getAuthToken = authData.accessCookie
+   #   self._TagList = self.getTagsList()
+
+
+   @property
+   def tagList(self):
+        self._tagList = {}
+        cookies = self.getAuthToken
+        r = requests.post(_GETTAGLIST, headers=_HEADERS, cookies=cookies)
+
+        response = r.json()
+        for i in response:
+                for tag in response[i]:
+                        tag_id = tag["slaveId"]
+                        tag_uuid = tag["uuid"]
+                        tag_name = tag["name"]
+                        tag_type = tag["tagType"]
+
+                        self._tagList[tag_uuid] = {'tag_id' : tag_id, 'tag_name' : tag_name, 'tag_type' : tag_type}
+
+        return self._tagList
+  
+
+   def getTemperature(self,uuid=""):
+        """
+        If no UUID provided, it will take the first sensor discovered
+        """
+   
+        if uuid=="":
+           uuid = self.tagList.keys()[0]
+        data = {
+             "uuid": uuid
+             }
+        cookies = self.getAuthToken
+
+        r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
+        parsed_response = r.json()
+        return parsed_response["d"]["temp_degC"]
+
+
+   def getHumidity(self,uuid=""):
+        """
+        If no UUID provided, it will take the first sensor discovered
+        """
+
+        if uuid=="":
+           uuid = self.tagList.keys()[0]
+        data = {
+             "uuid": uuid
+             }
+        cookies = self.getAuthToken
+
+        r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
+        parsed_response = r.json()
+        return parsed_response["d"]["cap"]
+
+   def getBatteryVolt(self,uuid=""):
+        """
+        If no UUID provided, it will take the first sensor discovered
+        """
+
+        if uuid=="":
+           uuid = self.tagList.keys()[0]
+        data = {
+             "uuid": uuid
+             }
+        cookies = self.getAuthToken
+
+        r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
+        parsed_response = r.json()
+        return parsed_response["d"]["battery_volts"]
+
+
 if __name__ == "__main__":
-	if login() == True:
-                while 1:
+
+    print "here"
+    #authCookie = ClientAuth() 
+    auth = ClientAuth() 
+    tags = WirelessTagData(auth) 
+    print tags.getTemperature(tags.tagList.keys()[1])
+    print tags.getHumidity()
+    print tags.getBatteryVolt()
+#	if login() == True:
+#                while 1:
  #                        GetTagList()
-			for i in GetTagList():
-			   print GetTagData(i) 
-                        time.sleep(3600)
+#			for i in GetTagList():
+#
+#			   print GetTagData(i) 
+#                        time.sleep(3600)
