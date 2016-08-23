@@ -1,5 +1,7 @@
 import requests
 import json
+from decimal import Decimal
+
 
 _USERNAME = ""
 _PASSWORD = ""
@@ -14,6 +16,8 @@ _GETTEMPDATA = _BASEURL + "/ethLogShared.asmx/GetLatestTemperatureRawDataByUUID"
 _HEADERS = {
 	"content-type": "application/json; charset=utf-8"
 }
+
+_DECIMALS = 1
 
 class ClientAuth:
     """
@@ -100,7 +104,9 @@ class WirelessTagData:
 
         r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
         parsed_response = r.json()
-        return parsed_response["d"]["temp_degC"]
+        temp = Decimal(float(parsed_response["d"]["temp_degC"]))
+       
+        return round(temp,_DECIMALS) 
 
 
    def getHumidity(self,uuid=""):
