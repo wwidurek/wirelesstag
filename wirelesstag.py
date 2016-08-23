@@ -34,11 +34,15 @@ class ClientAuth:
              }
 
        r = requests.post(_SIGNIN, headers=_HEADERS, data=json.dumps(postParams))
-        
        self._accessCookie = r.cookies 
        self._username = username
        self._password = password
-
+       
+       r = requests.post(_ISSIGNED, headers=_HEADERS,cookies=self._accessCookie)
+       response = r.json()
+       if response['d']!=True:
+          raise ValueError('Incorrect Login operation')
+      
     @property
     def accessCookie(self):
       #if not signed in, sign in and return cookie
