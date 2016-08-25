@@ -112,7 +112,7 @@ class WirelessTagData:
         rounded_temp = round(temp,_DECIMALS)
         print "XXX:"+rounded_temp       
         raise ValueError('temp'+rounded_temp)
-        return rounded_temp 
+        return 29 
 
 
    def getHumidity(self,uuid=""):
