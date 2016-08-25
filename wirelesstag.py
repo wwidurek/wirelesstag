@@ -109,8 +109,9 @@ class WirelessTagData:
         r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
         parsed_response = r.json()
         temp = Decimal(float(parsed_response["d"]["temp_degC"]))
-       
-        return round(temp,_DECIMALS) 
+        rounded_temp = round(temp,_DECIMALS)
+        print "XXX:"+rounded_temp       
+        return rounded_temp 
 
 
    def getHumidity(self,uuid=""):
