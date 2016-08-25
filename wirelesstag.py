@@ -111,6 +111,7 @@ class WirelessTagData:
         temp = Decimal(float(parsed_response["d"]["temp_degC"]))
         rounded_temp = round(temp,_DECIMALS)
         print "XXX:"+rounded_temp       
+        raise ValueError('temp'+rounded_temp)
         return rounded_temp 
 
 
