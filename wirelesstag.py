@@ -110,9 +110,7 @@ class WirelessTagData:
         parsed_response = r.json()
         temp = Decimal(float(parsed_response["d"]["temp_degC"]))
         rounded_temp = round(temp,_DECIMALS)
-        print "XXX:"+rounded_temp       
-        raise ValueError('temp'+rounded_temp)
-        return 29 
+        return rounded_temp 
 
 
    def getHumidity(self,uuid=""):
