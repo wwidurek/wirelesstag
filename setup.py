@@ -4,11 +4,12 @@ from distutils.core import setup
 
 
 setup(
-    name='pywirelesstags',
+    name='wirelesstag',
     version='0.5.2', # Should be updated with new versions
     author='Wojtek Widurek',
     author_email='wwidurek@gmail.com',
     py_modules=['wirelesstag'],
+    packages=['wirelesstag'],
     scripts=[],
     data_files=[],
     url='https://github.com/wwidurek/wirelesstag',
