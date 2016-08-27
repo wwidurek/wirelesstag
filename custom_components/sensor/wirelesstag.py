@@ -7,10 +7,10 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 REQUIREMENTS = [
-    'https://github.com/wwidurek/wirelesstag/archive/master.zip'
-    '#pywirelesstags==0.5.2']
+    'https://github.com/wwidurek/wirelesstag/archive/master.zipsdd'
+    '#wirelesstag==0.5.2']
 
-from pywirelesstagss import wirelesstag
+import wirelesstag
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup the sensor platform."""
