@@ -127,7 +127,10 @@ class WirelessTagData:
 
         r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
         parsed_response = r.json()
-        return parsed_response["d"]["cap"]
+        humid  = Decimal(float(parsed_response["d"]["cap"]))
+        rounded_humid = round(humid,_DECIMALS)
+
+        return rounded_humid 
 
    def getBatteryVolt(self,uuid=""):
         """
