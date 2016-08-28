@@ -6,14 +6,14 @@ from homeassistant.const import (
 import logging
 _LOGGER = logging.getLogger(__name__)
 
-REQUIREMENTS = [
-    'https://github.com/wwidurek/wirelesstag/archive/master.zipsdd'
-    '#wirelesstag==0.5.2']
+REQUIREMENTS = ['wirelesstag==0.5.2']
 
-import wirelesstag
+
+#import wirelesstag
 
 def setup_platform(hass, config, add_devices, discovery_info=None):
     """Setup the sensor platform."""
+    import wirelesstag
     username = config.get(CONF_USERNAME)
     password = config.get(CONF_PASSWORD)    
     #_LOGGER.error(
