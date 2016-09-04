@@ -18,6 +18,7 @@ _HEADERS = {
 }
 
 _DECIMALS = 1
+_DECIMALSVOLTAGE= 2
 
 class ClientAuth:
     """
@@ -146,5 +147,7 @@ class WirelessTagData:
 
         r  = requests.post(_GETTEMPDATA, headers=_HEADERS, cookies=cookies, data=json.dumps(data))
         parsed_response = r.json()
-        return parsed_response["d"]["battery_volts"]
+        voltage = Decimal(float(parsed_response["d"]["battery_volts"]))
+        rounded_voltage = round(voltage, _DECIMALSVOLTAGE)
+        return rounded_voltage 
 

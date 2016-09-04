@@ -9,9 +9,11 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_TEMPERATURE = 'Temperature'
 SENSOR_HUMIDITY = 'Humidity'
+SENSOR_VOLTAGE = 'Voltage'
 SENSOR_TYPES = {
     SENSOR_TEMPERATURE: ['Temperature', TEMP_CELSIUS],
-    SENSOR_HUMIDITY: ['Humidity', '%']
+    SENSOR_HUMIDITY: ['Humidity', '%'],
+    SENSOR_VOLTAGE: ['Voltage', 'V']
 }
 
 REQUIREMENTS = [
@@ -74,7 +76,9 @@ class WirelessTagSensor(Entity):
         if self._sensor_type == SENSOR_TEMPERATURE:
           self._state=self._tagData.getTemperature(self._uuid)
         elif self._sensor_type == SENSOR_HUMIDITY:
-          self._state=self._tagData.getHumidity(self._uuid) 
+          self._state=self._tagData.getHumidity(self._uuid)
+        elif self._sensor_type == SENSOR_VOLTAGE:
+          self._state=self._tagData.getBatteryVolt(self._uuid) 
         else:
           LOGGER.error('Sensor type: "%s" does not exist', self._sensor_type)
 
