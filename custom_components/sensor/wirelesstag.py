@@ -9,9 +9,11 @@ _LOGGER = logging.getLogger(__name__)
 
 SENSOR_TEMPERATURE = 'Temperature'
 SENSOR_HUMIDITY = 'Humidity'
+SENSOR_VOLTAGE = 'Voltage'
 SENSOR_TYPES = {
     SENSOR_TEMPERATURE: ['Temperature', TEMP_CELSIUS],
-    SENSOR_HUMIDITY: ['Humidity', '%']
+    SENSOR_HUMIDITY: ['Humidity', '%'],
+    SENSOR_VOLTAGE: ['Voltage', 'V']
 }
 
 REQUIREMENTS = [
@@ -37,7 +39,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
        tag_name=tagList[i]["tag_name"]
        for variable in config['monitored_conditions']:
           if variable not in SENSOR_TYPES:
-            LOGGER.error('Sensor type: "%s" does not exist', variable)
+            _LOGGER.error('Sensor type: "%s" does not exist', variable)
           else:
             dev.append(WirelessTagSensor(tag_name,tag_uuid,tagData,SENSOR_TYPES[variable][0]))
 
@@ -74,7 +76,9 @@ class WirelessTagSensor(Entity):
         if self._sensor_type == SENSOR_TEMPERATURE:
           self._state=self._tagData.getTemperature(self._uuid)
         elif self._sensor_type == SENSOR_HUMIDITY:
-          self._state=self._tagData.getHumidity(self._uuid) 
+          self._state=self._tagData.getHumidity(self._uuid)
+        elif self._sensor_type == SENSOR_VOLTAGE:
+          self._state=self._tagData.getBatteryVolt(self._uuid) 
         else:
-          LOGGER.error('Sensor type: "%s" does not exist', self._sensor_type)
+          _LOGGER.error('Sensor type: "%s" does not exist', self._sensor_type)
 
